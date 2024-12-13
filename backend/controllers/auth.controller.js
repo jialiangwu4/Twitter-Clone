@@ -65,7 +65,41 @@ export const signup = async (req, res) => {
   }
 };
 export const login = async (req, res) => {
-  res.json({ data: "this is login page. Work in progress" });
+  try {
+    const { username, password } = req.body;
+
+    // look for user
+    const user = await User.findOne({ username: username });
+    if (!user) {
+      return res.status(401).json({ error: "Invalid username or password" });
+    }
+
+    // check password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Invalid username or password" });
+    }
+
+    // set cookie on successful login
+    generateTokenAndSetCookie(user._id, res);
+
+    return res.status(200).json({
+      data: {
+        _id: user._id,
+        username: user.username,
+        fullName: user.fullName,
+        email: user.email,
+        followers: user.followers,
+        following: user.following,
+        profileImg: user.profileImg,
+        coverImg: user.coverImg,
+      },
+      message: "User logged in successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 };
 export const logout = async (req, res) => {
   res.json({ data: "this is logout page. Work in progress" });
