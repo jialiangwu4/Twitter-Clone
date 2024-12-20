@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import Notification from "../models/notification.model.js";
 
 export const getUserProfile = async (req, res) => {
   const { username } = req.params; // Get the username from the request parameters
@@ -64,8 +65,14 @@ export const followUnfollowUser = async (req, res) => {
         { new: true }
       );
 
-      // TODO: send notification
-      //
+      // Send a notification to the other user
+      const newNotification = new Notification({
+        type: "follow",
+        from: _id, // me
+        to: id, // user to be followed
+      });
+
+      await newNotification.save();
 
       return res.status(200).json({ message: "User followed successfully" });
     }
