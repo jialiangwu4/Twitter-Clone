@@ -150,3 +150,31 @@ export const likeUnlikePost = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getAllPosts = async (req, res) => {
+  try {
+    // get all posts
+    // this is not the best way to get all posts
+    // we should use pagination
+    // but for now, we will just get all posts
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "user",
+        select: "-password -email",
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password -email",
+      });
+
+    if (!posts) {
+      return res.status(200).json([]);
+    }
+
+    return res.status(200).json(posts);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
