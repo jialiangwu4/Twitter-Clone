@@ -128,10 +128,13 @@ export const likeUnlikePost = async (req, res) => {
     if (isLiked) {
       // unlike the post
       await Post.updateOne({ _id: id }, { $pull: { likes: userId } });
+      await User.updateOne({ _id: userId }, { $pull: { likedPosts: id } });
+
       return res.status(200).json({ message: "Post unliked successfully" });
     } else {
       // like the post
       await Post.updateOne({ _id: id }, { $push: { likes: userId } });
+      await User.updateOne({ _id: userId }, { $push: { likedPosts: id } });
 
       // create a notification send to the post owner
       const newNotification = new Notification({
@@ -151,6 +154,7 @@ export const likeUnlikePost = async (req, res) => {
   }
 };
 
+// NEED TO LOOK BACK ON THIS
 export const getAllPosts = async (req, res) => {
   try {
     // get all posts
@@ -173,6 +177,33 @@ export const getAllPosts = async (req, res) => {
     }
 
     return res.status(200).json(posts);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getLikedPosts = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // select the posts that the user has liked
+    const likedPosts = await Post.find({ _id: { $in: user.likedPosts } })
+      .populate({
+        path: "user",
+        select: "-password -email",
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password -email",
+      });
+
+    return res.status(200).json(likedPosts);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Internal server error" });
