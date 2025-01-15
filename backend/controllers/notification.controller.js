@@ -8,6 +8,7 @@ export const getNotifications = async (req, res) => {
       select: "username profileImg",
     });
 
+    // mark all notifications for the user as read
     await Notification.updateMany({ to: userId }, { $set: { read: true } });
 
     return res.status(200).json(notifications);
@@ -17,4 +18,10 @@ export const getNotifications = async (req, res) => {
   }
 };
 
-export const deleteNotifications = async (req, res) => {};
+export const deleteNotifications = async (req, res) => {
+  try {
+  } catch (error) {
+    console.log(error);
+    return res.status(500).jsonn({ error: "Internal server error" });
+  }
+};
