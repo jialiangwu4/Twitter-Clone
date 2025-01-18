@@ -1,13 +1,5 @@
 # Twitter-Clone
+
 Twitter Clone
 
-in the root folder: 
-```
-npm init -y
-npm install express mongoose jsonwebtoken bcryptjs dotenv cors cookie-parser cloudinary
-```
-
-in the frontend folder:
-```
-npm create vite@latest .
-```
+Source: https://www.youtube.com/watch?v=MDZC8VDZnV8&t=9159s&ab_channel=AsaProgrammer
