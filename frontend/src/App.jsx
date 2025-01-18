@@ -5,7 +5,7 @@ import SignUpPage from "./pages/auth/signup/SignUpPage.jsx";
 
 function App() {
   return (
-    <div>
+    <div className="flex max-w-6xl mx-auto">
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
