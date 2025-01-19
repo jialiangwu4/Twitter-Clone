@@ -14,7 +14,7 @@ export default {
       {
         dark: {
           ...themes["dark"],
-          primary: "gray",
+          primary: "#2BA2FC",
           secondary: "#636C78",
         },
       },
