@@ -14,6 +14,7 @@ import LoadingSpinner from "./components/common/LoadingSpinner.jsx";
 
 function App() {
   const { data: authUser, isLoading } = useQuery({
+    // queryKey is a unique identifier for the query, can be referenced in other elements
     queryKey: ["authUser"],
     queryFn: async () => {
       try {
