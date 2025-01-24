@@ -21,6 +21,14 @@ function App() {
         const res = await fetch("/api/auth/getuser");
         const data = await res.json();
 
+        // TODO:
+        // set the object to null after logging out (redirect to login page)
+        // might need to look back on this
+        // basically we need to check if the object is empty
+        if (data.error) {
+          return null;
+        }
+
         if (!res.ok) {
           throw new Error(data.error || "Something went wrong");
         }

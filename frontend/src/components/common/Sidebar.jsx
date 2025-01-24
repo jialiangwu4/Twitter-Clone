@@ -7,8 +7,11 @@ import { Link } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
 import toast from "react-hot-toast";
 import { useMutation } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Sidebar = () => {
+  const queryClient = useQueryClient();
+
   const { mutate: logoutMutate } = useMutation({
     mutationFn: async () => {
       try {
@@ -25,7 +28,9 @@ const Sidebar = () => {
       }
     },
     onSuccess: () => {
-      toast.success("Logged out successfully");
+      // invalidate the authUser query
+      // which will refetch the user data and cause a re-render
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
     onError: () => {
       toast.error("Logout failed");
