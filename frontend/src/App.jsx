@@ -30,6 +30,8 @@ function App() {
         throw new Error(error);
       }
     },
+
+    retry: false,
   });
 
   // show loading spinner while data is being fetched
