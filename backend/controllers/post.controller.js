@@ -231,7 +231,7 @@ export const getFollowingPosts = async (req, res) => {
         select: "-password -email",
       });
 
-    return res.status(200).json({ followingPosts });
+    return res.status(200).json(followingPosts);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Internal server error" });
