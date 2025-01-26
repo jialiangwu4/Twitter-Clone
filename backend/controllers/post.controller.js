@@ -7,7 +7,7 @@ import Notification from "../models/notification.model.js";
 export const createPost = async (req, res) => {
   try {
     const { text } = req.body;
-    let { image } = req.body;
+    let { img } = req.body;
     const userId = req.user._id;
 
     const user = await User.findById(userId);
@@ -16,22 +16,22 @@ export const createPost = async (req, res) => {
     }
 
     // at least one of text or image must be provided
-    if (!text && !image) {
+    if (!text && !img) {
       return res.status(400).json({ error: "Please provide text or image" });
     }
 
     // if image is provided, upload it to cloudinary
-    if (image) {
-      const result = await cloudinary.uploader.upload(image).catch((error) => {
+    if (img) {
+      const result = await cloudinary.uploader.upload(img).catch((error) => {
         console.log(error);
       });
-      image = result.secure_url;
+      img = result.secure_url;
     }
 
     const post = new Post({
       user: userId,
       text,
-      image,
+      img,
     });
 
     await post.save();
