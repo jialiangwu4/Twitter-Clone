@@ -17,6 +17,14 @@ const Post = ({ post }) => {
 
   const queryClient = useQueryClient();
 
+  const postOwner = post.user;
+  const isLiked = post.likes.includes(authUser?._id);
+
+  // check if the current user is the owner of the post
+  const isMyPost = authUser?._id === postOwner._id;
+
+  const formattedDate = formatPostDate(post.createdAt);
+
   // delete a post
   const {
     mutate: deletePost,
@@ -138,14 +146,6 @@ const Post = ({ post }) => {
       toast.error(error.message);
     },
   });
-
-  const postOwner = post.user;
-  const isLiked = post.likes.includes(authUser?._id);
-
-  // check if the current user is the owner of the post
-  const isMyPost = authUser?._id === postOwner._id;
-
-  const formattedDate = formatPostDate(post.createdAt);
 
   const handleDeletePost = () => {
     deletePost();
