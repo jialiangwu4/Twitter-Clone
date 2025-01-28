@@ -7,11 +7,13 @@ import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
 import EditProfileModal from "./EditProfileModal";
 import { formatMemberSinceDate } from "../../utils/date";
+import useFollow from "../../hooks/useFollow";
 
 import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const ProfilePage = () => {
   const [coverImg, setCoverImg] = useState(null);
@@ -24,12 +26,11 @@ const ProfilePage = () => {
   const coverImgRef = useRef(null);
   const profileImgRef = useRef(null);
 
+  const { followMutate, isPending } = useFollow();
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
   const { data: posts } = useQuery({
     queryKey: ["posts"],
   });
-
-  const isMyProfile = authUser?.username === username;
 
   // get the user profile
   const {
@@ -52,6 +53,9 @@ const ProfilePage = () => {
       }
     },
   });
+
+  const isMyProfile = authUser?._id === user?._id;
+  const isFollowing = authUser?.following.includes(user?._id);
 
   // refetch the user profile when the username(user profile) changes
   useEffect(() => {
@@ -146,9 +150,15 @@ const ProfilePage = () => {
                 {!isMyProfile && (
                   <button
                     className="btn btn-outline rounded-full btn-sm"
-                    onClick={() => alert("Followed successfully")}
+                    onClick={() => followMutate(user?._id)}
                   >
-                    Follow
+                    {isPending ? (
+                      <LoadingSpinner size="sm" />
+                    ) : isFollowing ? (
+                      "Following"
+                    ) : (
+                      "Follow"
+                    )}
                   </button>
                 )}
                 {(coverImg || profileImg) && (
