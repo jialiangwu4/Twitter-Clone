@@ -79,31 +79,28 @@ export const deletePost = async (req, res) => {
 
 export const commentPost = async (req, res) => {
   try {
-    // add image later
     const { id } = req.params;
     const { text } = req.body;
     const userId = req.user._id;
-
-    const post = await Post.findById(id);
-    if (!post) {
-      return res.status(404).json({ error: "Post not found" });
-    }
 
     if (!text) {
       return res.status(400).json({ error: "Please provide text" });
     }
 
-    // TODO: add image
+    //populate the updated post with the comment with the user info
+    //so we can make use of it for caching
+    const post = await Post.findByIdAndUpdate(
+      { _id: id },
+      { $push: { comments: { user: userId, text } } },
+      { new: true }
+    ).populate({
+      path: "comments.user",
+      select: "-password -email",
+    });
 
-    // create the comment
-    const comment = {
-      user: userId,
-      text,
-    };
-
-    // append the comment
-    post.comments.push(comment);
-    await post.save();
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
 
     return res.status(200).json(post);
   } catch (error) {

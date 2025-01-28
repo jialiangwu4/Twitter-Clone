@@ -93,6 +93,51 @@ const Post = ({ post }) => {
     },
   });
 
+  // comment on a post
+  const { mutate: commentPost, isPending: isCommenting } = useMutation({
+    mutationFn: async ({ comment }) => {
+      try {
+        const res = await fetch(`/api/posts/comment/${post._id}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text: comment }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "Something went wrong");
+        }
+        return data;
+      } catch (error) {
+        throw new Error(error.message);
+      }
+    },
+
+    onSuccess: (data) => {
+      toast.success("Comment added");
+
+      // update the cached data
+      queryClient.setQueryData(["posts"], (oldData) => {
+        const updatedComments = oldData.map((oldPost) => {
+          if (oldPost._id === post._id) {
+            return data;
+          } else {
+            return oldPost;
+          }
+        });
+        return updatedComments;
+      });
+      setComment(""); // reset the comment
+    },
+
+    onError: () => {
+      toast.error(error.message);
+    },
+  });
+
   const postOwner = post.user;
   const isLiked = post.likes.includes(authUser?._id);
 
@@ -101,14 +146,14 @@ const Post = ({ post }) => {
 
   const formattedDate = "1h";
 
-  const isCommenting = false;
-
   const handleDeletePost = () => {
     deletePost();
   };
 
   const handlePostComment = (e) => {
     e.preventDefault();
+    if (isCommenting) return; // prevent multiple clicks while the request is pending
+    commentPost({ comment });
   };
 
   const handleLikePost = () => {
