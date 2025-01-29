@@ -195,7 +195,7 @@ export const updateUserProfile = async (req, res) => {
       coverImg = uploadResult.secure_url;
     }
 
-    if (username) {
+    if (username && username !== user.username) {
       // Check if username already exists
       const existingUser = await User.findOne({ username });
       if (existingUser) {
@@ -204,7 +204,7 @@ export const updateUserProfile = async (req, res) => {
       user.username = username;
     }
 
-    if (email) {
+    if (email && email !== user.email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regular expression for email validation
       if (!emailRegex.test(email)) {
         // Check if email is valid
