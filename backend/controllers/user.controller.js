@@ -229,19 +229,16 @@ export const updateUserProfile = async (req, res) => {
     await user.save();
 
     return res.status(200).json({
-      data: {
-        _id: user._id,
-        username: user.username,
-        fullName: user.fullName,
-        email: user.email,
-        followers: user.followers,
-        following: user.following,
-        profileImg: user.profileImg,
-        coverImg: user.coverImg,
-        bio: user.bio,
-        link: user.link,
-      },
-      message: "User updated successfully",
+      _id: user._id,
+      username: user.username,
+      fullName: user.fullName,
+      email: user.email,
+      followers: user.followers,
+      following: user.following,
+      profileImg: user.profileImg,
+      coverImg: user.coverImg,
+      bio: user.bio,
+      link: user.link,
     });
   } catch (error) {
     console.log(error);
