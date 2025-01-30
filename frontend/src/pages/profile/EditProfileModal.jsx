@@ -1,19 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useUpdateProfile from "../../hooks/useUpdateProfile";
+import { useNavigate } from "react-router-dom";
 
-const EditProfileModal = () => {
+const EditProfileModal = ({ authUser }) => {
   const [formData, setFormData] = useState({
-    fullName: "",
     username: "",
+    fullName: "",
     email: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
     bio: "",
     link: "",
-    newPassword: "",
-    currentPassword: "",
   });
+
+  const { updateProfile, isUpdating } = useUpdateProfile();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    if (!authUser) return;
+    setFormData({
+      username: authUser.username,
+      fullName: authUser.fullName,
+      email: authUser.email,
+      bio: authUser.bio,
+      link: authUser.link,
+      currentPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
+    });
+  }, [authUser]);
+
+  const isUsernameChanged = formData.username !== authUser.username;
+  const navigate = useNavigate();
 
   return (
     <>
@@ -32,7 +54,11 @@ const EditProfileModal = () => {
             className="flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              alert("Profile updated successfully");
+              if (isUpdating) return;
+              updateProfile(formData);
+              if (isUsernameChanged) {
+                navigate(`/profile/${formData.username}`);
+              }
             }}
           >
             <div className="flex flex-wrap gap-2">
@@ -79,12 +105,24 @@ const EditProfileModal = () => {
                 name="currentPassword"
                 onChange={handleInputChange}
               />
+            </div>
+            <div className="flex flex-wrap gap-2">
               <input
                 type="password"
                 placeholder="New Password"
                 className="flex-1 input border border-gray-700 rounded p-2 input-md"
                 value={formData.newPassword}
                 name="newPassword"
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <input
+                type="password"
+                placeholder="Confirm New Password"
+                className="flex-1 input border border-gray-700 rounded p-2 input-md"
+                value={formData.confirmNewPassword}
+                name="confirmNewPassword"
                 onChange={handleInputChange}
               />
             </div>

@@ -8,6 +8,7 @@ import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkele
 import EditProfileModal from "./EditProfileModal";
 import { formatMemberSinceDate } from "../../utils/date";
 import useFollow from "../../hooks/useFollow";
+import useUpdateProfile from "../../hooks/useUpdateProfile";
 
 import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
@@ -28,9 +29,7 @@ const ProfilePage = () => {
 
   const { followMutate, isPending } = useFollow();
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
-  const { data: posts } = useQuery({
-    queryKey: ["posts"],
-  });
+  const { data: posts } = useQuery({ queryKey: ["posts"] });
 
   // get the user profile
   const {
@@ -53,6 +52,9 @@ const ProfilePage = () => {
       }
     },
   });
+
+  // update the user profile
+  const { updateProfile, isUpdating } = useUpdateProfile();
 
   const isMyProfile = authUser?._id === user?._id;
   const isFollowing = authUser?.following.includes(user?._id);
@@ -146,7 +148,7 @@ const ProfilePage = () => {
                 </div>
               </div>
               <div className="flex justify-end px-4 mt-5">
-                {isMyProfile && <EditProfileModal />}
+                {isMyProfile && <EditProfileModal authUser={authUser} />}
                 {!isMyProfile && (
                   <button
                     className="btn btn-outline rounded-full btn-sm"
@@ -164,9 +166,14 @@ const ProfilePage = () => {
                 {(coverImg || profileImg) && (
                   <button
                     className="btn btn-primary rounded-full btn-sm text-white px-4 ml-2"
-                    onClick={() => alert("Profile updated successfully")}
+                    onClick={async () => {
+                      if (isUpdating) return;
+                      await updateProfile({ profileImg, coverImg });
+                      setCoverImg(null);
+                      setProfileImg(null);
+                    }}
                   >
-                    Update
+                    {isUpdating ? "Updating..." : "Update"}
                   </button>
                 )}
               </div>
