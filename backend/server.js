@@ -1,3 +1,4 @@
+import path from "path";
 import express from "express";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -21,6 +22,7 @@ cloudinary.config({
 
 const app = express();
 const PORT = process.env.PORT || 8000;
+const __dirname = path.resolve();
 
 // set the limit for request body, note that the limit shouldn't be too large to avoid DoS attack
 app.use(express.json({ limit: "10mb" })); // Middleware to parse JSON request bodies
@@ -31,6 +33,14 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/notifications", notificationRoutes);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
